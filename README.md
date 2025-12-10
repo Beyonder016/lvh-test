@@ -1,63 +1,59 @@
-[🟢 Click here to try the Live Demo](https://huggingface.co/spaces/Beyonder016/lvh-gradio)
-
----
-
 # 🫀 LVH Detection from Chest X-Rays
 
-This web app detects **Left Ventricular Hypertrophy (LVH)** using a deep learning model trained on chest X-ray images. It uses Grad-CAM to visualize the areas influencing the prediction.
+This Streamlit app detects **Left Ventricular Hypertrophy (LVH)** on chest X-ray images and uses Grad-CAM to highlight the regions influencing the prediction. Upload an image to see the model's classification and attention map side by side.
 
 ---
 
-## 📦 Pretrained Models
-
-Looking to test the model with real predictions?
-
-👉 Head over to the **[Releases Page](https://github.com/Beyonder016/lvh-gradio/releases)** to download the latest pretrained model weights.
-
-**Available models:**
-- `resnet18_best.pth`
-- `resnet18_balanced.pth`
-- `resnet18_91acc.pth`
-
-Each model comes with a description to help you choose the best fit for your use case.
-
-> 📌 Note: Place the `.pth` file in the `model/` folder after downloading.
-
----
-
-## 🧪 Try with Sample Images
-
-To quickly test the model, use these folders:
-
-- 📂 [samples/LVH](samples/LVH) — X-rays with confirmed LVH  
-- 📂 [samples/No_LVH](samples/No_LVH) — X-rays without LVH
-
-👉 Download any image and upload it in the [Live Demo](https://huggingface.co/spaces/Beyonder016/lvh-gradio) interface to see predictions and Grad-CAM heatmaps.
-
----
-
-## ⚙️ How It Works
-
-1. Upload a `.jpg` or `.png` chest X-ray  
-2. The model predicts: **LVH** or **No LVH**  
-3. A heatmap highlights the region used for the prediction
-
----
-
-## 💻 Run Locally
+## 🚀 Quickstart (Streamlit)
 
 ```bash
 git clone https://github.com/Beyonder016/lvh-gradio.git
 cd lvh-gradio
 pip install -r requirements.txt
-python app.py
+streamlit run app_streamlit.py
 ```
+
+When the app starts, open the provided local URL to upload an image and view the prediction with its Grad-CAM heatmap.
+
+---
+
+## 📦 Pretrained Models
+
+Download the latest pretrained weights from the **[Releases Page](https://github.com/Beyonder016/lvh-gradio/releases)**.
+
+Available model file:
+
+- `resnet18_balanced.pth` (place the downloaded `.pth` or `.pt` file at the project root or in the `model/` directory)
+
+> The app will automatically load `lvh_model_f1_balanced.pt` if present locally, otherwise it falls back to downloading `model.pt` from the Hugging Face repository `Beyonder016/lvh-detector`.
+
+---
+
+## 🧪 Try with Sample Images
+
+Use these folders for quick tests:
+
+- 📂 [samples/LVH](samples/LVH) — X-rays with confirmed LVH
+- 📂 [samples/No_LVH](samples/No_LVH) — X-rays without LVH
+
+Download any image and upload it in the Streamlit interface to see predictions and Grad-CAM visualizations.
+
+---
+
+## ⚙️ How It Works
+
+1. Upload a `.jpg` or `.png` chest X-ray
+2. The model predicts: **LVH** or **No LVH**
+3. A Grad-CAM heatmap highlights the region used for the prediction
+
+---
+
 ## 🛠 Built With
 
-- PyTorch & torchvision  
-- Grad-CAM (model explainability)  
-- Gradio (interactive web UI)  
-- Hugging Face Spaces (deployment)
+- PyTorch & torchvision
+- Grad-CAM (model explainability)
+- Streamlit (interactive web UI)
+- Hugging Face Hub (model weights hosting)
 
 ---
 
