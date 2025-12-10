@@ -121,152 +121,29 @@ def overlay_heatmap(original: Image.Image, heatmap: np.ndarray) -> Image.Image:
 
 
 # --- Streamlit UI ---------------------------------------------------------
-st.set_page_config(page_title="LVH Detection via Chest X-Ray", layout="wide")
+st.set_page_config(page_title="LVH Detection via Chest X-Ray", layout="centered")
 
+st.title("💓 LVH Detection from Chest X-Ray")
 st.markdown(
-    """
-    <style>
-        .stApp {
-            background: radial-gradient(circle at 10% 20%, rgba(87, 227, 255, 0.25), transparent 25%),
-                        radial-gradient(circle at 80% 0%, rgba(0, 255, 200, 0.25), transparent 20%),
-                        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.12), transparent 30%),
-                        linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
-            color: #e2e8f0;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-            border-radius: 18px;
-            padding: 1.5rem;
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-        }
-
-        .accent-text {
-            color: #a5f3fc;
-        }
-
-        .glass-button button {
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.9), rgba(59, 130, 246, 0.9));
-            color: #0b1221;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.35);
-        }
-        .glass-button button:hover {
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 22px rgba(14, 165, 233, 0.55);
-        }
-
-        [data-testid="stFileUploader"] {
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            border: 1px dashed rgba(255, 255, 255, 0.35);
-            padding: 1rem;
-            backdrop-filter: blur(12px);
-        }
-
-        .blurred-badge {
-            display: inline-block;
-            padding: 0.4rem 0.75rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(10px);
-            color: #e2e8f0;
-            font-weight: 600;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
+    "Upload a chest X-ray image to detect Left Ventricular Hypertrophy (LVH) and visualize model attention with Grad-CAM."
 )
-
-hero = st.container()
-with hero:
-    st.markdown(
-        """
-        <div class="glass-card" style="text-align:center; margin-bottom: 1rem;">
-            <div class="blurred-badge">AI Radiology Assistant</div>
-            <h1 style="margin: 0.5rem 0;">LVH Detection from Chest X-Ray</h1>
-            <p style="margin: 0; font-size: 1.05rem; color: #dbeafe;">
-                Upload an X-ray to detect Left Ventricular Hypertrophy and visualize model attention via Grad-CAM.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
 model = load_model()
 
-upload_col, info_col = st.columns([1.3, 1])
-with upload_col:
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    uploaded = st.file_uploader(
-        "Upload a chest X-ray image", type=["png", "jpg", "jpeg"]
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with info_col:
-    st.markdown(
-        """
-        <div class="glass-card">
-            <h3 style="margin-top:0;">Tips for best results</h3>
-            <ul style="padding-left: 1.1rem; line-height: 1.5;">
-                <li>Use frontal chest X-rays with minimal artifacts.</li>
-                <li>Ensure image is clear and not overexposed.</li>
-                <li>PNG or JPG formats work best.</li>
-            </ul>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
+uploaded = st.file_uploader("Upload a chest X-ray image", type=["png", "jpg", "jpeg"])
 if uploaded:
     image = Image.open(uploaded)
+    st.image(image, caption="Uploaded X-ray", use_column_width=True)
 
     input_tensor = preprocess_image(image)
     with torch.no_grad():
         probability = torch.sigmoid(model(input_tensor)).item()
 
     label = "LVH" if probability >= 0.5 else "No LVH"
+    st.markdown(f"### Prediction: **{label}**")
+    st.markdown(f"**Confidence for LVH:** {probability:.2%}")
 
-    header_col1, header_col2 = st.columns([2, 1])
-    with header_col1:
-        st.markdown(
-            f"""
-            <div class="glass-card" style="margin-top: 1rem;">
-                <h3 style="margin-top:0;">Prediction</h3>
-                <p style="font-size: 1.1rem;">Result: <span class="accent-text"><strong>{label}</strong></span></p>
-                <p style="margin-bottom:0;">LVH Confidence: <strong>{probability:.2%}</strong></p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with header_col2:
-        st.markdown(
-            "<div class='glass-card glass-button' style='margin-top: 1rem;'>",
-            unsafe_allow_html=True,
-        )
-        generate_clicked = st.button(
-            "Generate Grad-CAM Heatmap", use_container_width=True, key="cam_btn"
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    display_col1, display_col2 = st.columns(2)
-    with display_col1:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.image(image, caption="Uploaded X-ray", use_column_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    if generate_clicked:
+    if st.button("Generate Grad-CAM Heatmap"):
         cam_prob, heatmap = generate_gradcam(model, input_tensor)
         overlay = overlay_heatmap(image, heatmap)
-        with display_col2:
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            st.image(
-                overlay,
-                caption=f"Grad-CAM Heatmap (LVH confidence: {cam_prob:.2%})",
-                use_column_width=True,
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.image(overlay, caption=f"Grad-CAM Heatmap (LVH confidence: {cam_prob:.2%})", use_column_width=True)
