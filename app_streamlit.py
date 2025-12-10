@@ -121,7 +121,7 @@ def overlay_heatmap(original: Image.Image, heatmap: np.ndarray) -> Image.Image:
 
 
 # --- Streamlit UI ---------------------------------------------------------
-st.set_page_config(page_title="LVH Detection via Chest X-Ray", layout="wide")
+st.set_page_config(page_title="LVH Detection via Chest X-Ray", layout="centered")
 
 st.title("💓 LVH Detection from Chest X-Ray")
 st.markdown(
@@ -130,35 +130,20 @@ st.markdown(
 
 model = load_model()
 
-uploaded = st.file_uploader(
-    "Upload a chest X-ray image", type=["png", "jpg", "jpeg"]
-)
+uploaded = st.file_uploader("Upload a chest X-ray image", type=["png", "jpg", "jpeg"])
 if uploaded:
     image = Image.open(uploaded)
+    st.image(image, caption="Uploaded X-ray", use_column_width=True)
 
     input_tensor = preprocess_image(image)
     with torch.no_grad():
         probability = torch.sigmoid(model(input_tensor)).item()
 
     label = "LVH" if probability >= 0.5 else "No LVH"
+    st.markdown(f"### Prediction: **{label}**")
+    st.markdown(f"**Confidence for LVH:** {probability:.2%}")
 
-    info_col, action_col = st.columns([2, 1])
-    with info_col:
-        st.markdown(f"### Prediction: **{label}**")
-        st.markdown(f"**Confidence for LVH:** {probability:.2%}")
-    with action_col:
-        generate_clicked = st.button("Generate Grad-CAM Heatmap", use_container_width=True)
-
-    left_col, right_col = st.columns(2)
-    with left_col:
-        st.image(image, caption="Uploaded X-ray", use_column_width=True)
-
-    if generate_clicked:
+    if st.button("Generate Grad-CAM Heatmap"):
         cam_prob, heatmap = generate_gradcam(model, input_tensor)
         overlay = overlay_heatmap(image, heatmap)
-        with right_col:
-            st.image(
-                overlay,
-                caption=f"Grad-CAM Heatmap (LVH confidence: {cam_prob:.2%})",
-                use_column_width=True,
-            )
+        st.image(overlay, caption=f"Grad-CAM Heatmap (LVH confidence: {cam_prob:.2%})", use_column_width=True)
