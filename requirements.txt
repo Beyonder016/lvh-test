@@ -1,0 +1,7 @@
+gradio>=3.50
+torch
+torchvision
+huggingface_hub
+Pillow
+matplotlib
+numpy
