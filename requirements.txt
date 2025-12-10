@@ -1,4 +1,5 @@
 gradio>=3.50
+streamlit>=1.39
 torch
 torchvision
 huggingface_hub
