@@ -1,6 +1,6 @@
 # 🫀 LVH Detection from Chest X-Rays
 
-This Streamlit app detects **Left Ventricular Hypertrophy (LVH)** on chest X-ray images and uses Grad-CAM to highlight the regions influencing the prediction. Upload an image to see the model's classification and attention map side by side.
+This Streamlit app detects **Left Ventricular Hypertrophy (LVH)** on chest X-ray images and uses Grad-CAM to highlight the regions influencing the prediction. Upload an image to see the model's classification and attention map side by side..
 
 ---
 
